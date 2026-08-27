@@ -58,6 +58,13 @@ lake env lean Hilbert16/AxiomAudit.lean
 The full Lake build completed all 823 jobs. The axiom output was identical to
 the list above and contained no project-specific axiom.
 
+After pushing commit `72e31e0`, a fresh shallow clone from the private GitHub
+remote was also checked. It had a clean worktree, contained the committed
+manifest and all Lean sources, contained no `.lake/` directory, and applied the
+local-only ignore rules for `Scratch/`, `local/`, and `artifacts/`. This verifies
+the Git payload; the target machine should still perform its own cache download
+and full build as the final cross-machine check.
+
 ## Boundary of this report
 
 This report certifies compilation of the discrete hierarchy and exact-counting
