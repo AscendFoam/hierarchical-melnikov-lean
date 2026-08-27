@@ -1,1 +1,13 @@
-/.lake
+# Rebuildable Lake dependencies and compiled objects (several GB).
+/.lake/
+
+# Local-only experiments and heavyweight generated artifacts.
+# Put portable proof sources in Hilbert16/ and compact results in tracked docs.
+/Scratch/
+/local/
+/artifacts/
+
+# Lean binary outputs created outside Lake's build directory.
+*.olean
+*.ilean
+*.olean.hash

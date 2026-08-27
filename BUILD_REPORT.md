@@ -42,6 +42,22 @@ axiom is declared.
 A source scan of every `*.lean` file found no `sorry`, `admit`, custom `axiom`,
 or `unsafe` declaration.
 
+## Project-local reproducibility check
+
+On 2026-08-27, `lake update` generated `lake-manifest.json` and locked Mathlib
+to `0df444a360eaa60ab8c11dca51a86af692955474`. Lake downloaded dependencies and
+precompiled cache into the ignored project-local `.lake/` directory (7.4 GB on
+this machine). With that manifest and cache, the following commands completed
+successfully:
+
+```text
+lake build
+lake env lean Hilbert16/AxiomAudit.lean
+```
+
+The full Lake build completed all 823 jobs. The axiom output was identical to
+the list above and contained no project-specific axiom.
+
 ## Boundary of this report
 
 This report certifies compilation of the discrete hierarchy and exact-counting
@@ -51,7 +67,10 @@ listed as out of scope in `README.md`.
 For a clean checkout with network access, the ordinary reproducible build is:
 
 ```text
-lake update
+lake exe cache get
 lake build
 lake env lean Hilbert16/AxiomAudit.lean
 ```
+
+`lake update` is a dependency-maintenance operation, not a normal clone/build
+step; using it routinely can rewrite the committed manifest.

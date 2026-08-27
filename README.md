@@ -40,11 +40,36 @@ formalization.**
 
 ## Build
 
-With `elan`/`lake` available, run:
+With `elan`/`lake` available, an existing checkout should use the committed
+manifest without updating dependency revisions:
 
 ```text
-lake update
+lake exe cache get
 lake build
+lake env lean Hilbert16/AxiomAudit.lean
 ```
 
-The dependency revisions are pinned in `lakefile.toml` and `lean-toolchain`.
+The Lean toolchain is pinned in `lean-toolchain`; Mathlib and its transitive
+dependencies are locked by `lake-manifest.json`. Run `lake update` only when
+intentionally changing dependencies, and commit the resulting manifest change
+with that update.
+
+## Git boundary
+
+Git is the source of truth for every handwritten `*.lean` file, the Lake
+configuration and manifest, mathematical documentation, reproducibility
+scripts, and compact text build/audit reports. A long proof should be split
+into readable modules, not omitted from Git merely because it is large.
+
+The following directories are deliberately local-only:
+
+- `.lake/`: downloaded dependencies, Mathlib cache, and compiled objects;
+- `Scratch/`: disposable experiments, including files that may contain
+  temporary `sorry` declarations and are not imported by `Hilbert16.lean`;
+- `local/`: private working notes or machine-specific inputs;
+- `artifacts/`: large generated certificates, traces, profiles, and renders.
+
+These directories are ignored rather than backed up. Anything needed to
+reproduce a theorem must instead be represented by tracked source, a generator
+and its small inputs, plus a compact result summary such as `BUILD_REPORT.md`.
+Do not place the only copy of irreplaceable work in an ignored directory.
