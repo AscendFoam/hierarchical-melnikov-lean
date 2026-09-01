@@ -1,42 +1,36 @@
 # Hilbert 16 Lean-Core
 
-This is a deliberately partial, zero-`sorry` Lean 4 formalization of the
-discrete core of the proposed lower-bound construction. It targets Lean
-`4.33.1` and Mathlib `v4.33.1`.
+This is a zero-`sorry`, end-to-end Lean 4 formalization of the repository's
+explicit lower-bound construction for the number of limit cycles of planar
+polynomial vector fields. It targets Lean `4.33.1` and Mathlib `v4.33.1`.
 
 ## Machine-checked scope
 
-- `Hilbert16/Hierarchy.lean` checks the coordinatewise visibility order,
-  monotonicity of `w(k,l)=k+l`, uniqueness of `(k,l)` as the minimum-weight
-  point in its visible quadrant, and the one-power gap for every other visible
-  block.
-- `Hilbert16/Counting.lean` checks the finite double-sum tensor identity over
-  an arbitrary commutative ring.
-- The same file defines the zero-based 3-adic data
-  `y_(k+1)=2*3^(r-k-1)` and `d_(k+1)=3^k`, and checks
-  `y_k*d_k=2*3^(r-1)`, `sum y_k=3^r-1`, and the exact total
-  `(2*3^(r-1)*r)^2-(3^r-1)^2`. This is the division-free form of
-  `4*n^2*r^2/9-(n-1)^2` with `n=3^r`.
-- `Hilbert16/AxiomAudit.lean` prints the axiom dependencies of every public
-  theorem above; it introduces no project-specific axiom.
-
-## Explicitly not formalized
-
-This repository is not an end-to-end Lean proof of the claimed Hilbert-number
-lower bound. In particular, it does not yet formalize:
-
-- the cardinality proofs identifying the analytic row/frequency sets with the
-  integer sequences used here;
-- Chebyshev/DCT visibility and the mod-12 replication character;
-- local analytic rank, rank-to-roots, or Borel-Gauss shift independence;
-- the hierarchical simple-root stability theorem in analytic germs;
-- the Melnikov kernel and the Poincare-Pontryagin persistence step;
-- polynomial degree bounds or the subsequence-to-all-degrees asymptotic step.
-
-Those facts must not be inferred from this Lean-Core. The accurate release
-claim is: **the combinatorial and exact-counting core listed above is machine
-checked; the analytic and dynamical interfaces remain outside the present
-formalization.**
+- `Hilbert16/Counting*`, `Hilbert16/Hierarchy*`, and
+  `Hilbert16/Chebyshev/ThreeAdicVisibility.lean` establish the exact three-adic
+  counts, visibility relations, and hierarchical indexing used by the
+  construction.
+- `Hilbert16/Spikes*`, `Hilbert16/Hypergeometric*`, and
+  `Hilbert16/Analytic*` connect the Borel--Gauss and Chebyshev kernels to finite
+  analytic rank, then turn that rank into hierarchical families of simple
+  positive roots.
+- `Hilbert16/Dynamics*` constructs the polynomial perturbations and local
+  flows, identifies the first Melnikov displacement, continues the simple
+  roots to actual periodic orbits, and proves that the resulting carriers are
+  isolated and pairwise disjoint.
+- `Hilbert16/Degree*` audits the polynomial degree, while
+  `Hilbert16/Asymptotics.lean` transfers the exact three-adic subsequence count
+  to all sufficiently large degrees.
+- `Hilbert16/Main.lean` exports both the exact subsequence theorem
+  `threeAdic_subsequence_limitCycle_lower_bound` and the all-degree theorem
+  `polynomial_limitCycle_lower_bound_asymptotic`. The latter produces, for all
+  sufficiently large `N`, a degree-at-most-`N` polynomial vector field with at
+  least `c * N^2 * (log N)^2` actual limit cycles for one explicit positive
+  constant `c`.
+- `Hilbert16/AxiomAudit.lean` prints the axiom dependencies of the public proof
+  surface. The audit uses only Lean/Mathlib's standard logical foundations
+  `propext`, `Classical.choice`, and `Quot.sound`; it introduces no
+  project-specific axiom.
 
 ## Build
 
