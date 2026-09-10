@@ -39,7 +39,16 @@ theorem threeAdicPolynomialCommonSeparatedPeriodicOrbits
               ChebyshevPolynomialPeriodicOrbitAt (C q) mu),
             0 < mu ∧ Pairwise (fun q p =>
               Disjoint (A q).orbit.carrier (A p).orbit.carrier) ∧
-              ∀ q, (A q).orbit.IsIsolated := by
+              (∀ q, (A q).orbit.IsIsolated) ∧
+              ∀ q, IsLocalPoincareReturnMap
+                (fun z => chebyshevPerturbedPhaseVector (3 ^ r) lambda
+                  (mvPolynomialProdEval (chebyshevPPolynomial (3 ^ r)
+                    (threeAdicHierarchicalDensityPolynomial r zeta blockCoeff))) mu z)
+                (fun e => chebyshevPhaseSectionPoint
+                  (C q).setup.n (C q).setup.i (C q).setup.j
+                    (C q).setup.lambda e)
+                ((C q).setup.energyReturnMap mu)
+                ((C q).continuation.root mu) := by
   rcases threeAdicPolynomialReturnCertificateRealization hr with
     ⟨Lambda, hLambda, hrealize⟩
   refine ⟨Lambda, hLambda, ?_⟩
@@ -102,51 +111,90 @@ theorem threeAdicPolynomialCommonSeparatedPeriodicOrbits
     rw [Filter.eventually_all]
     intro q
     exact (C q).eventually_isolatedPeriodicOrbitAt
+  have hallPoincare : ∀ᶠ mu in 𝓝 (0 : ℝ), ∀ q, mu ≠ 0 →
+      IsLocalPoincareReturnMap
+        (fun z => chebyshevPerturbedPhaseVector (3 ^ r) lambda
+          (mvPolynomialProdEval (chebyshevPPolynomial (3 ^ r)
+            (threeAdicHierarchicalDensityPolynomial r zeta blockCoeff))) mu z)
+        (fun e => chebyshevPhaseSectionPoint
+          (C q).setup.n (C q).setup.i (C q).setup.j (C q).setup.lambda e)
+        ((C q).setup.energyReturnMap mu)
+        ((C q).continuation.root mu) := by
+    rw [Filter.eventually_all]
+    intro q
+    exact (C q).eventually_isLocalPoincareReturnMap
   have hall : ∀ᶠ mu in 𝓝 (0 : ℝ), ∀ q, mu ≠ 0 →
       ∃ A : ChebyshevPolynomialPeriodicOrbitAt (C q) mu,
-        A.orbit.carrier ⊆ U q ∧ A.orbit.IsIsolated := by
-    filter_upwards [hallCarrier, hallIsolated] with mu hcarrier hisolated
+        A.orbit.carrier ⊆ U q ∧ A.orbit.IsIsolated ∧
+        IsLocalPoincareReturnMap
+          (fun z => chebyshevPerturbedPhaseVector (3 ^ r) lambda
+            (mvPolynomialProdEval (chebyshevPPolynomial (3 ^ r)
+              (threeAdicHierarchicalDensityPolynomial r zeta blockCoeff))) mu z)
+          (fun e => chebyshevPhaseSectionPoint
+            (C q).setup.n (C q).setup.i (C q).setup.j (C q).setup.lambda e)
+          ((C q).setup.energyReturnMap mu)
+          ((C q).continuation.root mu) := by
+    filter_upwards [hallCarrier, hallIsolated, hallPoincare]
+      with mu hcarrier hisolated hpoincare
     intro q hmu
     rcases hcarrier q hmu with ⟨A, hAsub⟩
     rcases hisolated q hmu with ⟨B, hBisolated⟩
     have horbit : A.orbit = B.orbit := by
       apply PeriodicOrbit.ext
       exact A.orbit_carrier.trans B.orbit_carrier.symm
-    refine ⟨A, hAsub, ?_⟩
+    refine ⟨A, hAsub, ?_, hpoincare q hmu⟩
     rw [horbit]
     exact hBisolated
   have hallWithin : ∀ᶠ mu in 𝓝[>] (0 : ℝ),
       0 < mu ∧ ∀ q, mu ≠ 0 →
         ∃ A : ChebyshevPolynomialPeriodicOrbitAt (C q) mu,
-          A.orbit.carrier ⊆ U q ∧ A.orbit.IsIsolated := by
+          A.orbit.carrier ⊆ U q ∧ A.orbit.IsIsolated ∧
+          IsLocalPoincareReturnMap
+            (fun z => chebyshevPerturbedPhaseVector (3 ^ r) lambda
+              (mvPolynomialProdEval (chebyshevPPolynomial (3 ^ r)
+                (threeAdicHierarchicalDensityPolynomial r zeta blockCoeff))) mu z)
+            (fun e => chebyshevPhaseSectionPoint
+              (C q).setup.n (C q).setup.i (C q).setup.j (C q).setup.lambda e)
+            ((C q).setup.energyReturnMap mu)
+            ((C q).continuation.root mu) := by
     filter_upwards [self_mem_nhdsWithin,
       hall.filter_mono inf_le_left] with mu hmu hallmu
     exact ⟨hmu, hallmu⟩
   rcases hallWithin.exists with ⟨mu, hmu, hmuAll⟩
   have hAexists : ∀ q, ∃ A : ChebyshevPolynomialPeriodicOrbitAt (C q) mu,
-      A.orbit.carrier ⊆ U q ∧ A.orbit.IsIsolated :=
+      A.orbit.carrier ⊆ U q ∧ A.orbit.IsIsolated ∧
+      IsLocalPoincareReturnMap
+        (fun z => chebyshevPerturbedPhaseVector (3 ^ r) lambda
+          (mvPolynomialProdEval (chebyshevPPolynomial (3 ^ r)
+            (threeAdicHierarchicalDensityPolynomial r zeta blockCoeff))) mu z)
+        (fun e => chebyshevPhaseSectionPoint
+          (C q).setup.n (C q).setup.i (C q).setup.j (C q).setup.lambda e)
+        ((C q).setup.energyReturnMap mu)
+        ((C q).continuation.root mu) :=
     fun q => hmuAll q hmu.ne'
-  choose A hAsub hAisolated using hAexists
-  refine ⟨blockCoeff, root, zeta, hzeta, hinj, C, mu, A, hmu, ?_, hAisolated⟩
+  choose A hAsub hAisolated hApoincare using hAexists
+  refine ⟨blockCoeff, root, zeta, hzeta, hinj, C, mu, A, hmu, ?_,
+    hAisolated, hApoincare⟩
   intro q p hqp
   exact (hUpair hqp).mono (hAsub q) (hAsub p)
 
-/-- The full dynamical realization theorem: at the exact audited degree
-ceiling there is one polynomial vector field carrying the three-adic lower
-bound as pairwise distinct genuine limit cycles. -/
-theorem exists_threeAdicPolynomialVectorField_with_limitCycles
+/-- The full standard-hyperbolic realization theorem: at the exact audited
+degree ceiling there is one polynomial vector field carrying the three-adic
+lower bound as a finite injective family of genuine hyperbolic limit cycles. -/
+theorem exists_threeAdicPolynomialVectorField_with_hyperbolicLimitCycles
     {r : ℕ} (hr : 1 ≤ r) :
     ∃ lambda : ℝ, 1 < lambda ∧
       ∃ X : PolyVectorField,
         X.degree ≤ ((4 * 3 ^ r - 5 : ℕ) : WithBot ℕ) ∧
-        HasAtLeastLimitCycles X.eval (cycleLowerBound r) := by
+        HasAtLeastHyperbolicLimitCycles X.eval (cycleLowerBound r) := by
   classical
   rcases threeAdicPolynomialCommonSeparatedPeriodicOrbits hr with
     ⟨Lambda, hLambda, hrealize⟩
   let lambda : ℝ := Lambda + 1
   have hlambda : Lambda < lambda := by dsimp [lambda]; linarith
   rcases hrealize lambda hlambda with
-    ⟨blockCoeff, root, zeta, hzeta, hinj, C, mu, A, hmu, hpair, hisolated⟩
+    ⟨blockCoeff, root, zeta, hzeta, hinj, C, mu, A, hmu, hpair,
+      hisolated, hpoincare⟩
   let S : MvPolynomial (Fin 2) ℝ :=
     threeAdicHierarchicalDensityPolynomial r zeta blockCoeff
   let X : PolyVectorField := finalPolyVectorField (3 ^ r) lambda mu S
@@ -161,18 +209,32 @@ theorem exists_threeAdicPolynomialVectorField_with_limitCycles
     exact finalPolyVectorField_eval_eq_perturbedPhaseVector
       (3 ^ r) lambda mu S z
   rw [hfieldEq]
-  let L : ThreeAdicCycleIndex r → LimitCycle
+  let L : ThreeAdicCycleIndex r → HyperbolicLimitCycle
       (fun z : PhaseSpace => chebyshevPerturbedPhaseVector (3 ^ r) lambda
         (mvPolynomialProdEval (chebyshevPPolynomial (3 ^ r) S)) mu z) :=
     fun q => {
-      orbit := (A q).orbit
-      isIsolated := hisolated q }
+      toLimitCycle := {
+        orbit := (A q).orbit
+        isIsolated := hisolated q }
+      isHyperbolic := ⟨{
+        sectionMap := fun e => chebyshevPhaseSectionPoint
+          (C q).setup.n (C q).setup.i (C q).setup.j (C q).setup.lambda e
+        returnMap := (C q).setup.energyReturnMap mu
+        fixedCoordinate := (C q).continuation.root mu
+        multiplier := (A q).multiplier
+        section_fixed_mem := (A q).sectionPoint_mem_orbit
+        return_fixed := (A q).energy_fixed
+        multiplier_deriv := (A q).multiplier_deriv
+        multiplier_pos := (A q).multiplier_pos
+        multiplier_ne_one := (A q).multiplier_ne_one
+        multiplier_abs_ne_one := (A q).multiplier_abs_ne_one
+        isLocalReturn := hpoincare q }⟩ }
   have hLinjective : Function.Injective L := by
     intro q p hL
     by_contra hqp
     have hdis := hpair hqp
     have hcarrierEq : (A q).orbit.carrier = (A p).orbit.carrier :=
-      congrArg (fun Z => Z.orbit.carrier) hL
+      congrArg (fun Z => Z.toLimitCycle.orbit.carrier) hL
     rcases (A q).orbit.carrier_nonempty with ⟨z, hzq⟩
     have hzp : z ∈ (A p).orbit.carrier := by
       rw [← hcarrierEq]
@@ -183,5 +245,17 @@ theorem exists_threeAdicPolynomialVectorField_with_limitCycles
       (Fintype.equivFin (ThreeAdicCycleIndex r)).symm
   refine ⟨fun k => L (indexEquiv k), ?_⟩
   exact hLinjective.comp indexEquiv.injective
+
+/-- Forgetting the standard Poincaré certificate recovers the previous
+finite injective family of isolated limit cycles. -/
+theorem exists_threeAdicPolynomialVectorField_with_limitCycles
+    {r : ℕ} (hr : 1 ≤ r) :
+    ∃ lambda : ℝ, 1 < lambda ∧
+      ∃ X : PolyVectorField,
+        X.degree ≤ ((4 * 3 ^ r - 5 : ℕ) : WithBot ℕ) ∧
+        HasAtLeastLimitCycles X.eval (cycleLowerBound r) := by
+  rcases exists_threeAdicPolynomialVectorField_with_hyperbolicLimitCycles hr with
+    ⟨lambda, hlambda, X, hdegree, hcycles⟩
+  exact ⟨lambda, hlambda, X, hdegree, hcycles.toHasAtLeastLimitCycles⟩
 
 end Hilbert16

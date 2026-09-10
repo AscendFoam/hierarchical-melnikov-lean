@@ -27,7 +27,9 @@ structure ChebyshevPolynomialPeriodicOrbitAt
   multiplier : ℝ
   multiplier_deriv : HasDerivAt (C.setup.energyReturnMap mu) multiplier
     (C.continuation.root mu)
+  multiplier_pos : 0 < multiplier
   multiplier_ne_one : multiplier ≠ 1
+  multiplier_abs_ne_one : |multiplier| ≠ 1
   orbit : PeriodicOrbit
     (fun z => chebyshevPerturbedPhaseVector n lambda
       (mvPolynomialProdEval (chebyshevPPolynomial n S₀)) mu z)
@@ -35,6 +37,23 @@ structure ChebyshevPolynomialPeriodicOrbitAt
     (periodicExtension
       (C.setup.returnTime.time (mu, C.continuation.root mu))
       (C.setup.returnCurve (mu, C.continuation.root mu)))
+
+/-- The fixed section point used by the genuine Poincaré map lies on the
+packaged periodic-orbit carrier. -/
+theorem ChebyshevPolynomialPeriodicOrbitAt.sectionPoint_mem_orbit
+    {n i j : ℕ} {lambda h : ℝ} {S₀ : MvPolynomial (Fin 2) ℝ}
+    {C : ChebyshevPolynomialReturnCertificate n i j lambda h S₀}
+    {mu : ℝ} (A : ChebyshevPolynomialPeriodicOrbitAt C mu) :
+    chebyshevPhaseSectionPoint C.setup.n C.setup.i C.setup.j
+        C.setup.lambda (C.continuation.root mu) ∈ A.orbit.carrier := by
+  rw [A.orbit_carrier]
+  refine ⟨0, ?_⟩
+  rw [periodicExtension_zero]
+  have hzero := C.setup.localFlow.chebyshevByEnergy_initial
+    C.setup.n C.setup.i C.setup.j C.setup.lambda mu
+      (C.continuation.root mu)
+      (C.setup.localFlow.zero_mem mu _)
+  simpa only [ChebyshevReturnSetup.returnCurve] using hzero
 
 /-- Along the implicit simple-root branch, every sufficiently small
 nonzero parameter produces the complete fixed-point, multiplier, and
@@ -64,16 +83,18 @@ theorem ChebyshevPolynomialReturnCertificate.eventually_periodicOrbitAt
   have horbit := hpath.eventually
     (C.setup.eventually_exists_periodicOrbit_of_energy_fixed
       (mvPolynomialProdEval (chebyshevPPolynomial n S₀)) hX)
-  filter_upwards [C.eventually_fixed_hyperbolic, horbit]
+  filter_upwards [C.eventually_fixed_standardHyperbolic, horbit]
     with mu hhyper horbitMu
   intro hmu
-  rcases hhyper hmu with ⟨hfixed, rho, hrho, hrhoNe⟩
+  rcases hhyper hmu with ⟨hfixed, rho, hrho, hrhoPos, hrhoNe, habs⟩
   rcases horbitMu hfixed with ⟨O, hO⟩
   exact ⟨{
     energy_fixed := hfixed
     multiplier := rho
     multiplier_deriv := hrho
+    multiplier_pos := hrhoPos
     multiplier_ne_one := hrhoNe
+    multiplier_abs_ne_one := habs
     orbit := O
     orbit_carrier := hO }⟩
 

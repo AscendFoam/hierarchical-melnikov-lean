@@ -50,6 +50,73 @@ structure ChebyshevPolynomialReturnCertificate
         HasDerivAt (setup.energyReturnMap mu) rho (continuation.root mu) ∧
           rho ≠ 1
 
+/-- The genuine planar return multiplier in every polynomial return
+certificate is eventually positive.  Combining this with the stored
+`rho ≠ 1` conclusion gives the standard `|rho| ≠ 1` spectral condition. -/
+theorem ChebyshevPolynomialReturnCertificate.eventually_fixed_standardHyperbolic
+    {n i j : ℕ} {lambda h : ℝ} {S₀ : MvPolynomial (Fin 2) ℝ}
+    (C : ChebyshevPolynomialReturnCertificate n i j lambda h S₀) :
+    ∀ᶠ mu in 𝓝 (0 : ℝ), mu ≠ 0 →
+      C.setup.energyReturnMap mu (C.continuation.root mu) =
+          C.continuation.root mu ∧
+        ∃ rho : ℝ,
+          HasDerivAt (C.setup.energyReturnMap mu) rho
+              (C.continuation.root mu) ∧
+            0 < rho ∧ rho ≠ 1 ∧ |rho| ≠ 1 := by
+  let P : ℝ × ℝ → ℝ :=
+    mvPolynomialProdEval (chebyshevPPolynomial n S₀)
+  let D : ℝ × ℝ → ℝ :=
+    C.setup.melnikovIntegral (chebyshevEnergyProduction n P)
+  have hP : ContDiff ℝ 1 P :=
+    contDiff_mvPolynomialProdEval (chebyshevPPolynomial n S₀) 1
+  have hD : ContDiffAt ℝ 1 D (0, h) := by
+    simpa only [D, C.setup_n, C.setup_energy] using
+      C.setup.contDiffAt_actualMelnikov P hP
+  have hX : ∀ (mu : ℝ) (z : PhaseSpace),
+      chebyshevPerturbedPhaseVector n lambda P mu z =
+        chebyshevPerturbedPhaseVector C.setup.n C.setup.lambda P mu z := by
+    intro mu z
+    rw [C.setup_n, C.setup_lambda]
+  have hpositive : ∀ᶠ mu in 𝓝 (0 : ℝ), ∀ rho : ℝ,
+      HasDerivAt (C.setup.energyReturnMap mu) rho
+        (C.continuation.root mu) → 0 < rho := by
+    have hnormalized :=
+      C.continuation.eventually_normalizedReturnMap_multiplier_pos hD
+    obtain ⟨V, hVopen, hbaseV, hfactor⟩ :=
+      C.setup.exists_actualMelnikovFactorizationNeighborhood P hX hP
+    let rootPoint : ℝ → ℝ × ℝ :=
+      fun mu => (mu, C.continuation.root mu)
+    have hrootPointAt : ContinuousAt rootPoint 0 :=
+      continuousAt_id.prodMk C.continuation.contDiffAt_root.continuousAt
+    have hrootPointZero : rootPoint 0 = (0, h) := by
+      exact Prod.ext rfl C.continuation.root_at
+    have hrootIn : ∀ᶠ mu in 𝓝 (0 : ℝ), rootPoint mu ∈ V := by
+      have htend : Tendsto rootPoint (𝓝 (0 : ℝ))
+          (𝓝 ((0 : ℝ), C.setup.h₀)) := by
+        rw [C.setup_energy, ← hrootPointZero]
+        exact hrootPointAt
+      exact htend.eventually (hVopen.mem_nhds hbaseV)
+    filter_upwards [hnormalized, hrootIn] with mu hpos hmuV
+    intro rho hrho
+    have hsliceIn : ∀ᶠ e in 𝓝 (C.continuation.root mu), (mu, e) ∈ V :=
+      (continuousAt_const.prodMk continuousAt_id).eventually_mem
+        (hVopen.mem_nhds hmuV)
+    have heqGerm : C.setup.energyReturnMap mu =ᶠ[𝓝 (C.continuation.root mu)]
+        normalizedReturnMap D mu := by
+      filter_upwards [hsliceIn] with e he
+      simpa only [D, C.setup_n] using (hfactor (mu, e) he).2
+    have hrhoNormalized : HasDerivAt (normalizedReturnMap D mu) rho
+        (C.continuation.root mu) :=
+      hrho.congr_of_eventuallyEq heqGerm.symm
+    exact hpos rho hrhoNormalized
+  filter_upwards [C.eventually_fixed_hyperbolic, hpositive]
+    with mu hlegacy hpos
+  intro hmu
+  rcases hlegacy hmu with ⟨hfixed, rho, hrho, hrhoNe⟩
+  have hrhoPos : 0 < rho := hpos rho hrho
+  exact ⟨hfixed, rho, hrho, hrhoPos, hrhoNe,
+    abs_ne_one_of_pos_of_ne_one hrhoPos hrhoNe⟩
+
 /-- Finitely many local return-persistence germs admit one common positive
 nonzero perturbation parameter. -/
 theorem exists_commonPositiveParameter_of_returnCertificates

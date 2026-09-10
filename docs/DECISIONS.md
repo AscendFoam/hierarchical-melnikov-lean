@@ -57,9 +57,19 @@ Disjoint annular neighborhoods will prove inequality of carriers in the final in
 ## D005 — Limit cycle and hyperbolicity
 
 - A limit cycle is a periodic-orbit carrier isolated among nearby periodic-orbit carriers.
-- Hyperbolicity is certified by a local transverse Poincare map whose derivative at the fixed point
-  is not `1`.
+- Hyperbolicity is certified by a local transverse Poincare map whose derivative `rho` at the fixed
+  point satisfies the standard spectral condition `|rho| ≠ 1`.
 - The dynamics package must prove that this certificate implies isolation; it is not an input axiom.
+
+The certificate is proposition-valued inside `HyperbolicLimitCycle`, so two packages with the same
+carrier are equal by proof irrelevance.  It nevertheless records the scalar section chart, the
+fixed section coordinate on the carrier, the genuine return map, and its derivative.  The predicate
+`IsLocalPoincareReturnMap` additionally requires an open coordinate neighborhood, a strictly positive
+return time for every nearby coordinate, a `C¹` injective section chart, a differentiable section
+equation transverse to the vector field throughout that neighborhood, and an actual ODE solution
+curve from the section point to the point named by the return map.  Thus an arbitrary scalar map
+cannot be packaged as the Poincare map merely by supplying its derivative.  The certificate records
+`0<rho`, `rho≠1`, and the derived standard condition `|rho|≠1` separately.
 
 ## D006 — Analytic representatives
 
@@ -949,8 +959,9 @@ branch" assumption and without invoking winding-number or global-flow machinery.
 
 ## D052 — State the final asymptotic theorem as direct field existence
 
-Define `DegreeNAdmitsAtLeast N L` by existence of a real planar polynomial vector field of degree at
-most `N` together with an injective `Fin L` family of actual `LimitCycle`s.  Reindex the exact
+Define `DegreeNAdmitsAtLeastHyperbolic N L` by existence of a real planar polynomial vector field of
+degree at most `N` together with an injective `Fin L` family of actual `HyperbolicLimitCycle`s.
+Reindex the exact
 dependent `ThreeAdicCycleIndex r` family by its proved cardinality and use pairwise carrier
 disjointness for injectivity.  The public subsequence theorem instantiates this at
 `N=4*3^r-5` and `L=cycleLowerBound r`.
@@ -960,5 +971,23 @@ subsequence field itself as a degree-`≤N` witness.  Combine the exact count wi
 inequalities to obtain the explicit positive multiple of `N²(log N)²`.
 
 Rationale: the final theorem no longer assumes a monotone or finite-valued Hilbert-number function;
-it directly returns the polynomial field and finite injective limit-cycle family required by the
-paper's existential lower bound.
+it directly returns the polynomial field and finite injective standard-hyperbolic limit-cycle
+family required by the paper's existential lower bound.  The older `DegreeNAdmitsAtLeast` interface
+is retained as a forgetful corollary.
+
+## D053 — Prove planar multiplier positivity before using the standard spectral condition
+
+For the actual energy Poincare map, use the exact local identity
+`R_mu(h)=h+mu*D(mu,h)`.  Along any continued root branch, joint `C¹` regularity makes
+`partial₂D(mu,h(mu))` continuous, hence the multiplier
+`rho(mu)=1+mu*partial₂D(mu,h(mu))` tends to `1`.  After shrinking the same eventual parameter
+neighborhood, prove `0<rho`.  Transfer this derivative statement across the proved germ equality
+between the normalized map and the genuine flow return map.
+
+Only after positivity is available use `abs_of_pos` to derive `|rho|≠1` from the existing
+`rho≠1`.  Never infer the absolute-value condition from `rho≠1` alone, since `rho=-1` is the obvious
+counterexample.
+
+Rationale: the earlier project convention called `rho≠1` “hyperbolic”, which is sufficient for
+fixed-point isolation but weaker than the standard Poincare spectral definition.  The positivity
+lemma closes exactly that semantic gap without a new axiom or a global-flow assumption.

@@ -185,4 +185,112 @@ theorem ChebyshevReturnSetup.eventually_energyReturnMap_fixed_and_hyperbolic
   · rcases hn.2 with ⟨rho, hrho, hrhoNe⟩
     exact ⟨rho, hrho.congr_of_eventuallyEq heqGerm, hrhoNe⟩
 
+/-- Positivity transfers from the normalized scalar return map to the
+genuine flow return map along any continuous root branch through the
+unperturbed energy. -/
+theorem ChebyshevReturnSetup.eventually_energyReturnMap_multiplier_pos
+    {X : ℝ → PhaseSpace → PhaseSpace} (S : ChebyshevReturnSetup X)
+    (P : ℝ × ℝ → ℝ)
+    (hX : ∀ (mu : ℝ) (z : PhaseSpace),
+      X mu z = chebyshevPerturbedPhaseVector S.n S.lambda P mu z)
+    (hP : ContDiff ℝ 1 P)
+    (C : LocalZeroContinuation
+      (S.melnikovIntegral (chebyshevEnergyProduction S.n P)) (0, S.h₀)) :
+    ∀ᶠ mu in 𝓝 (0 : ℝ), ∀ rho : ℝ,
+      HasDerivAt (S.energyReturnMap mu) rho (C.root mu) → 0 < rho := by
+  let D := S.melnikovIntegral (chebyshevEnergyProduction S.n P)
+  have hD : ContDiffAt ℝ 1 D (0, S.h₀) :=
+    S.contDiffAt_actualMelnikov P hP
+  have hnormalized := C.eventually_normalizedReturnMap_multiplier_pos hD
+  obtain ⟨V, hVopen, hbaseV, hfactor⟩ :=
+    S.exists_actualMelnikovFactorizationNeighborhood P hX hP
+  let rootPoint : ℝ → ℝ × ℝ := fun mu ↦ (mu, C.root mu)
+  have hrootPointAt : ContinuousAt rootPoint 0 :=
+    continuousAt_id.prodMk C.contDiffAt_root.continuousAt
+  have hrootPointZero : rootPoint 0 = (0, S.h₀) := by
+    exact Prod.ext rfl C.root_at
+  have hrootIn : ∀ᶠ mu in 𝓝 (0 : ℝ), rootPoint mu ∈ V := by
+    have htend : Tendsto rootPoint (𝓝 (0 : ℝ)) (𝓝 (0, S.h₀)) := by
+      rw [← hrootPointZero]
+      exact hrootPointAt
+    exact htend.eventually (hVopen.mem_nhds hbaseV)
+  filter_upwards [hnormalized, hrootIn] with mu hpos hmuV
+  intro rho hrho
+  have hsliceIn : ∀ᶠ h in 𝓝 (C.root mu), (mu, h) ∈ V :=
+    (continuousAt_const.prodMk continuousAt_id).eventually_mem
+      (hVopen.mem_nhds hmuV)
+  have heqGerm : S.energyReturnMap mu =ᶠ[𝓝 (C.root mu)]
+      normalizedReturnMap D mu := by
+    filter_upwards [hsliceIn] with h hh
+    exact (hfactor (mu, h) hh).2
+  have hrhoNormalized : HasDerivAt (normalizedReturnMap D mu) rho
+      (C.root mu) := hrho.congr_of_eventuallyEq heqGerm.symm
+  exact hpos rho (by simpa only [D] using hrhoNormalized)
+
+/-- Standard spectral strengthening for the genuine planar Poincaré map.
+The multiplier is positive and hence its previously proved inequality
+`rho ≠ 1` is equivalent to the standard condition `|rho| ≠ 1`. -/
+theorem ChebyshevReturnSetup.eventually_energyReturnMap_fixed_and_standardHyperbolic
+    {X : ℝ → PhaseSpace → PhaseSpace} (S : ChebyshevReturnSetup X)
+    (P : ℝ × ℝ → ℝ)
+    (hX : ∀ (mu : ℝ) (z : PhaseSpace),
+      X mu z = chebyshevPerturbedPhaseVector S.n S.lambda P mu z)
+    (hP : ContDiff ℝ 1 P) {d : ℝ}
+    (hzero : S.melnikovIntegral
+      (chebyshevEnergyProduction S.n P) (0, S.h₀) = 0)
+    (hslice : HasDerivAt
+      (fun h : ℝ ↦ S.melnikovIntegral
+        (chebyshevEnergyProduction S.n P) (0, h)) d S.h₀)
+    (hd : d ≠ 0) :
+    let C := ContDiffAt.localZeroContinuation_of_hasDerivAt
+      (S.contDiffAt_actualMelnikov P hP) hzero hslice hd
+    ∀ᶠ mu in nhds (0 : ℝ), mu ≠ 0 →
+      S.energyReturnMap mu (C.root mu) = C.root mu ∧
+        ∃ rho : ℝ, HasDerivAt (S.energyReturnMap mu) rho (C.root mu) ∧
+          0 < rho ∧ rho ≠ 1 ∧ |rho| ≠ 1 := by
+  let D := S.melnikovIntegral (chebyshevEnergyProduction S.n P)
+  have hD : ContDiffAt ℝ 1 D (0, S.h₀) :=
+    S.contDiffAt_actualMelnikov P hP
+  let C := ContDiffAt.localZeroContinuation_of_hasDerivAt
+    hD hzero hslice hd
+  change ∀ᶠ mu in nhds (0 : ℝ), mu ≠ 0 →
+    S.energyReturnMap mu (C.root mu) = C.root mu ∧
+      ∃ rho : ℝ, HasDerivAt (S.energyReturnMap mu) rho (C.root mu) ∧
+        0 < rho ∧ rho ≠ 1 ∧ |rho| ≠ 1
+  have hnormalized : ∀ᶠ mu in nhds (0 : ℝ), mu ≠ 0 →
+      normalizedReturnMap D mu (C.root mu) = C.root mu ∧
+        ∃ rho : ℝ,
+          HasDerivAt (normalizedReturnMap D mu) rho (C.root mu) ∧
+            0 < rho ∧ rho ≠ 1 ∧ |rho| ≠ 1 := by
+    simpa [C] using eventually_normalizedReturnMap_fixed_and_standardHyperbolic
+      hD hzero hslice hd
+  obtain ⟨V, hVopen, hbaseV, hfactor⟩ :=
+    S.exists_actualMelnikovFactorizationNeighborhood P hX hP
+  let rootPoint : ℝ → ℝ × ℝ := fun mu ↦ (mu, C.root mu)
+  have hrootPointAt : ContinuousAt rootPoint 0 :=
+    continuousAt_id.prodMk C.contDiffAt_root.continuousAt
+  have hrootPointZero : rootPoint 0 = (0, S.h₀) := by
+    exact Prod.ext rfl C.root_at
+  have hrootIn : ∀ᶠ mu in nhds (0 : ℝ), rootPoint mu ∈ V := by
+    have htend : Tendsto rootPoint (nhds (0 : ℝ)) (nhds (0, S.h₀)) := by
+      rw [← hrootPointZero]
+      exact hrootPointAt
+    exact htend.eventually (hVopen.mem_nhds hbaseV)
+  filter_upwards [hnormalized, hrootIn] with mu hnorm hmuV
+  intro hmu
+  have hn := hnorm hmu
+  have heqAt := (hfactor (rootPoint mu) hmuV).2
+  have hsliceIn : ∀ᶠ h in nhds (C.root mu), (mu, h) ∈ V :=
+    (continuousAt_const.prodMk continuousAt_id).eventually_mem
+      (hVopen.mem_nhds hmuV)
+  have heqGerm : S.energyReturnMap mu =ᶠ[nhds (C.root mu)]
+      normalizedReturnMap D mu := by
+    filter_upwards [hsliceIn] with h hh
+    exact (hfactor (mu, h) hh).2
+  refine ⟨?_, ?_⟩
+  · rw [heqAt]
+    exact hn.1
+  · rcases hn.2 with ⟨rho, hrho, hrhoPos, hrhoNe, habs⟩
+    exact ⟨rho, hrho.congr_of_eventuallyEq heqGerm, hrhoPos, hrhoNe, habs⟩
+
 end Hilbert16

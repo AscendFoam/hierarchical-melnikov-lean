@@ -187,6 +187,88 @@ theorem ChebyshevPolynomialReturnCertificate.exists_compactReturnIterationInterv
     exact hadmE.2.2.2 t (by
       simpa [uIcc_of_le hadmE.2.2.1.le] using ht)
 
+/-- On a common punctured parameter neighborhood, the actual scalar energy
+map is formally certified as a local Poincaré return map of the polynomial
+ODE, not merely named as one. -/
+theorem ChebyshevPolynomialReturnCertificate.eventually_isLocalPoincareReturnMap
+    {n i j : ℕ} {lambda h : ℝ} {S₀ : MvPolynomial (Fin 2) ℝ}
+    (C : ChebyshevPolynomialReturnCertificate n i j lambda h S₀) :
+    ∀ᶠ mu in 𝓝 (0 : ℝ), mu ≠ 0 →
+      IsLocalPoincareReturnMap
+        (fun z => chebyshevPerturbedPhaseVector n lambda
+          (mvPolynomialProdEval (chebyshevPPolynomial n S₀)) mu z)
+        (fun e => chebyshevPhaseSectionPoint C.setup.n C.setup.i C.setup.j
+          C.setup.lambda e)
+        (C.setup.energyReturnMap mu) (C.continuation.root mu) := by
+  obtain ⟨a, b, ha, hah, hhb, hb, hreturn⟩ :=
+    C.exists_compactReturnIterationInterval
+  have hrootTendsto : Tendsto C.continuation.root (𝓝 (0 : ℝ)) (𝓝 h) := by
+    have hrootAt : C.continuation.root 0 = h := by
+      simpa using C.continuation.root_at
+    have ht := C.continuation.contDiffAt_root.continuousAt
+    change Tendsto C.continuation.root (𝓝 (0 : ℝ))
+      (𝓝 (C.continuation.root 0)) at ht
+    have hnhds : 𝓝 (C.continuation.root 0) = 𝓝 h :=
+      congrArg nhds hrootAt
+    rw [hnhds] at ht
+    exact ht
+  have hroot : ∀ᶠ mu in 𝓝 (0 : ℝ),
+      C.continuation.root mu ∈ Set.Ioo a b :=
+    hrootTendsto.eventually (isOpen_Ioo.mem_nhds ⟨hah, hhb⟩)
+  filter_upwards [hreturn, hroot] with mu hreturnMu hrootMu
+  intro hmu
+  have hdata := hreturnMu hmu
+  have hregular : Set.Ioo a b ⊆ Set.Ioo (0 : ℝ) (1 / 2) := by
+    intro e he
+    exact ⟨ha.trans he.1, he.2.trans hb⟩
+  refine ⟨Set.Ioo a b, isOpen_Ioo, hrootMu, ?_, ?_,
+    chebyshevSectionCoordinate C.setup.n C.setup.j,
+    (fun _ => chebyshevSectionFDeriv),
+    (fun e => C.setup.returnTime.time (mu, e)),
+    (fun e => C.setup.returnCurve (mu, e)), ?_, ?_, ?_, ?_⟩
+  · intro e he
+    exact (contDiffAt_chebyshevPhaseSectionPoint C.setup.n C.setup.i
+      C.setup.j C.setup.lambda (hregular he).1 (hregular he).2).contDiffWithinAt
+  · intro e he f hf hef
+    have henergy := congrArg (chebyshevPhaseEnergy C.setup.n C.setup.lambda) hef
+    rw [chebyshevPhaseSectionPoint_energy_eq C.setup.n_ne_zero
+        C.setup.lambda_ge_one (hregular he).1.le (hregular he).2.le,
+      chebyshevPhaseSectionPoint_energy_eq C.setup.n_ne_zero
+        C.setup.lambda_ge_one (hregular hf).1.le (hregular hf).2.le] at henergy
+    exact henergy
+  · intro e he
+    exact chebyshevPhaseSectionPoint_on_section _ _ _ _ _
+  · intro e he
+    exact chebyshevSectionCoordinate_hasFDerivAt _ _ _
+  · intro e he
+    have htrans := chebyshevSectionFDeriv_phaseHamiltonianVector_ne_zero
+      C.setup.n_ne_zero C.setup.i_lt C.setup.j_lt C.setup.lambda_ge_one
+        (hregular he).1 (hregular he).2
+    simpa [C.setup_n, C.setup_lambda, chebyshevSectionFDeriv,
+      chebyshevPerturbedPhaseVector, chebyshevPerturbedVector,
+      chebyshevPhaseHamiltonianVector, Spikes.chebyshevHamiltonianVector]
+      using htrans
+  intro e he
+  have heIcc : e ∈ Set.Icc a b := ⟨he.1.le, he.2.le⟩
+  have heData := hdata.2.2.2 e heIcc
+  refine ⟨heData.1, ?_, ?_, ?_⟩
+  · exact C.setup.localFlow.chebyshevByEnergy_initial
+      C.setup.n C.setup.i C.setup.j C.setup.lambda mu e
+      (C.setup.localFlow.zero_mem mu _)
+  · simpa only [ChebyshevReturnSetup.returnCurve,
+      ← C.setup.returnPoint_eq_flow] using heData.2.2.1
+  · intro t ht
+    change HasDerivAt
+      (fun s => C.setup.localFlow.chebyshevByEnergy
+        C.setup.n C.setup.i C.setup.j C.setup.lambda ((mu, e), s))
+      (chebyshevPerturbedPhaseVector n lambda
+        (mvPolynomialProdEval (chebyshevPPolynomial n S₀)) mu
+          (C.setup.localFlow.chebyshevByEnergy
+            C.setup.n C.setup.i C.setup.j C.setup.lambda ((mu, e), t))) t
+    exact C.setup.localFlow.chebyshevByEnergy_hasDerivAt
+      C.setup.n C.setup.i C.setup.j C.setup.lambda mu e t
+        (heData.2.1 t ht)
+
 /-- Every sufficiently small nonzero parameter carries the continued
 periodic orbit as an actual isolated periodic-orbit carrier. -/
 theorem ChebyshevPolynomialReturnCertificate.eventually_isolatedPeriodicOrbitAt
