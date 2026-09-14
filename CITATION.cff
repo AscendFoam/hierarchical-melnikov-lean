@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this formalization, please cite the companion manuscript and this software release."
+type: software
+title: "Lean formalization of the hierarchical Melnikov lower bound for Hilbert numbers"
+version: 1.0.0
+date-released: 2026-09-14
+repository-code: "https://github.com/AscendFoam/hierarchical-melnikov-lean"
+url: "https://github.com/AscendFoam/hierarchical-melnikov-lean"
+authors:
+  - family-names: Qin
+    given-names: Chaoyang
+  - family-names: Zhou
+    given-names: Hongyi
+  - family-names: Sun
+    given-names: Xiaoming
+preferred-citation:
+  type: article
+  title: "Hierarchical Melnikov Realization and an N-squared Log-squared Lower Bound for Hilbert Numbers"
+  year: 2026
+  authors:
+    - family-names: Qin
+      given-names: Chaoyang
+    - family-names: Zhou
+      given-names: Hongyi
+    - family-names: Sun
+      given-names: Xiaoming

@@ -1,8 +1,10 @@
 # Hilbert 16 Lean proof map
 
-Last updated: 2026-09-02
+Last updated: 2026-09-14
 
-This file maps the mathematical source of truth, `../arxiv_v1/main.tex`, to Lean declarations.
+This file maps the companion manuscript *Hierarchical Melnikov Realization and an
+N-squared Log-squared Lower Bound for Hilbert Numbers* to Lean declarations.
+The `arxiv-v1` release freezes the manuscript-facing version of this map.
 The only allowed status values are `planned`, `proving`, `proved`, and `blocked`.
 
 ## Status convention

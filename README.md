@@ -16,17 +16,21 @@ polynomial vector fields. It targets Lean `4.33.1` and Mathlib `v4.33.1`.
   positive roots.
 - `Hilbert16/Dynamics*` constructs the polynomial perturbations and local
   flows, identifies the first Melnikov displacement, continues the simple
-  roots to actual periodic orbits, and proves that the resulting carriers are
-  isolated and pairwise disjoint.
+  roots to actual periodic orbits, and constructs genuine transverse local
+  Poincare return certificates. It proves that each planar multiplier is
+  positive and differs from one in modulus, and that the resulting carriers
+  are isolated and pairwise disjoint.
 - `Hilbert16/Degree*` audits the polynomial degree, while
   `Hilbert16/Asymptotics.lean` transfers the exact three-adic subsequence count
   to all sufficiently large degrees.
-- `Hilbert16/Main.lean` exports both the exact subsequence theorem
-  `threeAdic_subsequence_limitCycle_lower_bound` and the all-degree theorem
-  `polynomial_limitCycle_lower_bound_asymptotic`. The latter produces, for all
-  sufficiently large `N`, a degree-at-most-`N` polynomial vector field with at
-  least `c * N^2 * (log N)^2` actual limit cycles for one explicit positive
-  constant `c`.
+- `Hilbert16/Main.lean` exports the exact subsequence theorem
+  `threeAdic_subsequence_hyperbolicLimitCycle_lower_bound` and the all-degree
+  theorem `polynomial_hyperbolicLimitCycle_lower_bound_asymptotic`. The latter
+  produces, for every `N >= 144`, a degree-at-most-`N` polynomial vector field
+  with an injective family of at least `c * N^2 * (log N)^2`
+  standard-hyperbolic limit cycles, where
+  `c = 1 / (5184 * (log 3)^2)`. The limit-cycle-only endpoints remain available
+  as forgetful corollaries.
 - `Hilbert16/AxiomAudit.lean` prints the axiom dependencies of the public proof
   surface. The audit uses only Lean/Mathlib's standard logical foundations
   `propext`, `Classical.choice`, and `Quot.sound`; it introduces no
@@ -47,6 +51,24 @@ The Lean toolchain is pinned in `lean-toolchain`; Mathlib and its transitive
 dependencies are locked by `lake-manifest.json`. Run `lake update` only when
 intentionally changing dependencies, and commit the resulting manifest change
 with that update.
+
+## Continuous integration
+
+The GitHub Actions workflow uses the pinned toolchain and manifest, runs the
+standard Lean project build, and then executes the explicit axiom audit:
+
+```text
+lake build
+lake env lean Hilbert16/AxiomAudit.lean
+```
+
+## Companion manuscript
+
+This repository accompanies *Hierarchical Melnikov Realization and an
+N-squared Log-squared Lower Bound for Hilbert Numbers*. The release tagged
+`arxiv-v1` identifies the formal source corresponding to the first arXiv
+submission. `docs/PROOF_MAP.md` maps manuscript labels to audited Lean
+declarations.
 
 ## Git boundary
 
