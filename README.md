@@ -1,5 +1,7 @@
 # Hilbert 16 Lean-Core
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22752134.svg)](https://doi.org/10.5281/zenodo.22752134)
+
 This is a zero-`sorry`, end-to-end Lean 4 formalization of the repository's
 explicit lower-bound construction for the number of limit cycles of planar
 polynomial vector fields. It targets Lean `4.33.1` and Mathlib `v4.33.1`.
@@ -68,7 +70,8 @@ This repository accompanies *Hierarchical Melnikov Realization and an
 N-squared Log-squared Lower Bound for Hilbert Numbers*. The release tagged
 `arxiv-v1` identifies the formal source corresponding to the first arXiv
 submission. `docs/PROOF_MAP.md` maps manuscript labels to audited Lean
-declarations.
+declarations. The immutable release archive is available as
+[Zenodo record 10.5281/zenodo.22752134](https://doi.org/10.5281/zenodo.22752134).
 
 ## Git boundary
 
