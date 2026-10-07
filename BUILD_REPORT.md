@@ -1,5 +1,9 @@
 # Lean-Core build report
 
+Latest verification (2026-10-07): the revised explicit Corollary 1.2 for every
+`d >= 31` passed the full macOS build, the 415-declaration axiom audit, and the
+boundary/public-statement checks. See the final section for this revision.
+
 Date: 2026-08-27--2026-08-28
 
 ## Versions
@@ -813,3 +817,55 @@ On 2026-08-28 the Windows-native full command `lake build` completed successfull
 `lake env lean Hilbert16/AxiomAudit.lean` then completed successfully.  Every newly added isolation
 and main theorem reports exactly the standard logical foundations `propext`, `Classical.choice`,
 and `Quot.sound`; no project-specific axiom appears.
+
+### Revised explicit all-degree bound, 2026-10-07
+
+The revised Corollary 1.2 is now exported as
+`polynomial_hyperbolicLimitCycle_lower_bound_explicit`. For every natural degree
+`d >= 31`, it gives a degree-at-most-`d` real planar polynomial vector field
+with an injective family of `L` standard hyperbolic limit cycles such that
+
+$$
+ B(d)=\frac{(d+5)^2}{324}
+       \left(\frac{\ln((d+5)/12)}{\ln 3}\right)^2
+       -\frac{(d+1)^2}{16}<L.
+$$
+
+`Asymptotics.lean` obtains the upper scale estimate from the lower side of the
+degree bracket, bounds the subtracted square, and combines this with the
+existing strict positive-term estimate and exact real count formula.
+`Main.lean` applies the numerical estimate to the existing actual polynomial
+field and its finite hyperbolic cycle family. The earlier positive `Omega`
+theorem remains available with its original constant and threshold.
+
+Verification used Lean `4.33.1`, commit
+`819816b2e0a3bf405af45ae5c7af2491d8f5bee6`, on `arm64-apple-darwin24.6.0`.
+All nine dependency checkouts were clean and matched `lake-manifest.json`;
+Mathlib remained pinned to `0df444a360eaa60ab8c11dca51a86af692955474`.
+
+- `lake build Hilbert16.Asymptotics`: passed, 3506 jobs.
+- `lake build`: passed, 3593 jobs, including the revised `Main` and root module.
+- `lake env lean Hilbert16/AxiomAudit.lean`: passed; all 415 requested
+  declarations produced audit output. Their dependencies contain only
+  `propext`, `Classical.choice`, and `Quot.sound`.
+- The external review file compiled successfully. It checked
+  `allDegreeIndex 31 = 2`, the exact constructed count `80`, and `B(31) = -60`.
+  It also unpacked the new public theorem directly into a polynomial field,
+  its degree bound, actual hyperbolic limit cycles, and the numerical estimate.
+- A comment-aware scan of all 85 formal source files found no `sorry`, `admit`,
+  custom `axiom`, or `unsafe` declaration. `git diff --check` passed.
+
+Existing proof-style linter warnings were retained; the newly added proofs
+compiled without warnings or errors.
+
+All project compilation artifacts are stored through the ignored `.lake`
+symlink at `/Volumes/OrbStackSSD/MathResearch/Hilbert16/build/lake`.
+The pinned package cache is shared with the existing external-SSD Mathlib
+installation. The project build directory occupies approximately 241 MiB.
+Full logs and the boundary review source are in
+`/Volumes/OrbStackSSD/MathResearch/Hilbert16/build/logs/`:
+
+- `asymptotics-20261007.log`
+- `full-build-20261007.log`
+- `axiom-audit-20261007.log`
+- `review-20261007.lean` and `review-20261007.log`

@@ -49,6 +49,28 @@ theorem threeAdic_subsequence_limitCycle_lower_bound
     DegreeNAdmitsAtLeast (subsequenceDegree r) (cycleLowerBound r) := by
   exact (threeAdic_subsequence_hyperbolicLimitCycle_lower_bound hr).toDegreeNAdmitsAtLeast
 
+/-- Revised Corollary 1.2: the explicit bound for every degree `d ≥ 31`. -/
+theorem polynomial_hyperbolicLimitCycle_lower_bound_explicit
+    {d : ℕ} (hd : 31 ≤ d) :
+    ∃ L : ℕ, DegreeNAdmitsAtLeastHyperbolic d L ∧
+      allDegreeLowerBound d < (L : ℝ) := by
+  let r : ℕ := allDegreeIndex d
+  have hr : 2 ≤ r := two_le_allDegreeIndex hd
+  rcases threeAdic_subsequence_hyperbolicLimitCycle_lower_bound hr with
+    ⟨X, hXdegree, hXcycles⟩
+  have hdegreeNat : subsequenceDegree r ≤ d := (allDegreeIndex_bracket hd).1
+  have hXdegreeD : X.degree ≤ (d : WithBot ℕ) :=
+    hXdegree.trans (by exact_mod_cast hdegreeNat)
+  exact ⟨cycleLowerBound r, ⟨X, hXdegreeD, hXcycles⟩,
+    allDegreeLowerBound_lt_cycleLowerBound hd⟩
+
+/-- The revised explicit bound after forgetting the hyperbolic certificates. -/
+theorem polynomial_limitCycle_lower_bound_explicit
+    {d : ℕ} (hd : 31 ≤ d) :
+    ∃ L : ℕ, DegreeNAdmitsAtLeast d L ∧ allDegreeLowerBound d < (L : ℝ) := by
+  rcases polynomial_hyperbolicLimitCycle_lower_bound_explicit hd with ⟨L, hcycles, hcount⟩
+  exact ⟨L, hcycles.toDegreeNAdmitsAtLeast, hcount⟩
+
 /-- Direct all-degree form with a finite injective family of standard
 hyperbolic limit cycles. -/
 theorem polynomial_hyperbolicLimitCycle_lower_bound_asymptotic :

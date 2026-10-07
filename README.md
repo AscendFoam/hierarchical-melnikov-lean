@@ -26,13 +26,19 @@ polynomial vector fields. It targets Lean `4.33.1` and Mathlib `v4.33.1`.
   `Hilbert16/Asymptotics.lean` transfers the exact three-adic subsequence count
   to all sufficiently large degrees.
 - `Hilbert16/Main.lean` exports the exact subsequence theorem
-  `threeAdic_subsequence_hyperbolicLimitCycle_lower_bound` and the all-degree
-  theorem `polynomial_hyperbolicLimitCycle_lower_bound_asymptotic`. The latter
-  produces, for every `N >= 144`, a degree-at-most-`N` polynomial vector field
-  with an injective family of at least `c * N^2 * (log N)^2`
-  standard-hyperbolic limit cycles, where
-  `c = 1 / (5184 * (log 3)^2)`. The limit-cycle-only endpoints remain available
-  as forgetful corollaries.
+  `threeAdic_subsequence_hyperbolicLimitCycle_lower_bound` and the revised
+  Corollary 1.2 endpoint `polynomial_hyperbolicLimitCycle_lower_bound_explicit`.
+  For every `d >= 31`, the latter returns a degree-at-most-`d` polynomial
+  vector field with an injective family of `L` standard-hyperbolic limit cycles
+  satisfying `allDegreeLowerBound d < L`, where
+
+  $$B(d)=\frac{(d+5)^2}{324}\left(\frac{\ln((d+5)/12)}{\ln 3}\right)^2
+         -\frac{(d+1)^2}{16}.$$
+
+  The asymptotic endpoint `polynomial_hyperbolicLimitCycle_lower_bound_asymptotic`
+  also remains proved, with threshold `144` and
+  `c = 1 / (5184 * (log 3)^2)`. Both endpoints have limit-cycle-only
+  forgetful corollaries.
 - `Hilbert16/AxiomAudit.lean` prints the axiom dependencies of the public proof
   surface. The audit uses only Lean/Mathlib's standard logical foundations
   `propext`, `Classical.choice`, and `Quot.sound`; it introduces no
@@ -53,6 +59,11 @@ The Lean toolchain is pinned in `lean-toolchain`; Mathlib and its transitive
 dependencies are locked by `lake-manifest.json`. Run `lake update` only when
 intentionally changing dependencies, and commit the resulting manifest change
 with that update.
+
+In the current macOS checkout, `.lake` points to
+`/Volumes/OrbStackSSD/MathResearch/Hilbert16/build/lake`. Compiled project files
+and build/audit logs are stored on that external SSD. Its `packages` directory
+reuses the existing Mathlib cache with the same manifest-pinned revisions.
 
 ## Continuous integration
 

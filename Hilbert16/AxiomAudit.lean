@@ -14,7 +14,11 @@ import Hilbert16
 #print axioms Hilbert16.cycleLowerBound_gt_leading
 #print axioms Hilbert16.allDegreeIndex_bracket
 #print axioms Hilbert16.allDegreeIndex_scale_lower
+#print axioms Hilbert16.allDegreeIndex_scale_upper
 #print axioms Hilbert16.allDegreeIndex_log_lower
+#print axioms Hilbert16.allDegreeLowerBound_eq_four_mul_explicit
+#print axioms Hilbert16.allDegreeLowerBound_lt_cycleLowerBound
+#print axioms Hilbert16.subsequenceToAllDegrees_explicit
 #print axioms Hilbert16.subsequenceToAllDegrees
 #print axioms Hilbert16.hilbertAsymptoticConstant_pos
 #print axioms Hilbert16.half_log_le_shifted_log
@@ -407,5 +411,7 @@ import Hilbert16
 #print axioms Hilbert16.exists_threeAdicPolynomialVectorField_with_hyperbolicLimitCycles
 #print axioms Hilbert16.threeAdic_subsequence_limitCycle_lower_bound
 #print axioms Hilbert16.threeAdic_subsequence_hyperbolicLimitCycle_lower_bound
+#print axioms Hilbert16.polynomial_limitCycle_lower_bound_explicit
+#print axioms Hilbert16.polynomial_hyperbolicLimitCycle_lower_bound_explicit
 #print axioms Hilbert16.polynomial_limitCycle_lower_bound_asymptotic
 #print axioms Hilbert16.polynomial_hyperbolicLimitCycle_lower_bound_asymptotic

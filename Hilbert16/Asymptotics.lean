@@ -116,6 +116,17 @@ theorem allDegreeIndex_scale_lower {N : ℕ} (hN : 31 ≤ N) :
     simpa [mul_comm] using hnat
   exact_mod_cast hnat'
 
+/-- The lower half of the degree bracket bounds the selected scale from above. -/
+theorem allDegreeIndex_scale_upper {d : ℕ} (hd : 31 ≤ d) :
+    (3 : ℝ) ^ allDegreeIndex d ≤ ((d : ℝ) + 5) / 4 := by
+  have hlow := (allDegreeIndex_bracket hd).1
+  unfold subsequenceDegree at hlow
+  have hnat : 4 * 3 ^ allDegreeIndex d ≤ d + 5 := by omega
+  apply (le_div_iff₀ (by norm_num : (0 : ℝ) < 4)).2
+  have hnat' : 3 ^ allDegreeIndex d * 4 ≤ d + 5 := by
+    simpa [mul_comm] using hnat
+  exact_mod_cast hnat'
+
 /-- Taking logarithms in the scale estimate yields the second inequality
 in Eq. (6.11). -/
 theorem allDegreeIndex_log_lower {N : ℕ} (hN : 31 ≤ N) :
@@ -131,7 +142,7 @@ theorem allDegreeIndex_log_lower {N : ℕ} (hN : 31 ≤ N) :
   apply (div_lt_iff₀ (Real.log_pos (by norm_num : (1 : ℝ) < 3))).2
   simpa [mul_comm] using hlog
 
-/-- The explicit right-hand side of Eq. (6.12). -/
+/-- A positive coarse all-degree estimate used for the `Omega` conclusion. -/
 noncomputable def explicitAllDegreeLowerBound (N : ℕ) : ℝ :=
   ((N : ℝ) + 5) ^ 2 / 1296 *
     (Real.log (((N : ℝ) + 5) / 12) / Real.log 3) ^ 2
@@ -179,9 +190,48 @@ theorem explicitAllDegreeLowerBound_lt_leading {N : ℕ} (hN : 31 ≤ N) :
   rw [heq]
   exact (div_lt_div_iff_of_pos_right (by norm_num : (0 : ℝ) < 9)).2 hprod
 
-/-- **Equations (6.10)--(6.12), subsequence to all degrees.**  Any monotone
-lower-bound function satisfying the exact three-adic subsequence estimate
-satisfies the paper's explicit all-degree estimate for every `N ≥ 31`. -/
+/-- The explicit lower bound in the revised Corollary 1.2, valid for `d ≥ 31`. -/
+noncomputable def allDegreeLowerBound (d : ℕ) : ℝ :=
+  ((d : ℝ) + 5) ^ 2 / 324 *
+    (Real.log (((d : ℝ) + 5) / 12) / Real.log 3) ^ 2 -
+      ((d : ℝ) + 1) ^ 2 / 16
+
+theorem allDegreeLowerBound_eq_four_mul_explicit (d : ℕ) :
+    allDegreeLowerBound d =
+      4 * explicitAllDegreeLowerBound d - ((d : ℝ) + 1) ^ 2 / 16 := by
+  unfold allDegreeLowerBound explicitAllDegreeLowerBound
+  ring
+
+/-- Estimate the positive and negative terms of the exact count separately. -/
+theorem allDegreeLowerBound_lt_cycleLowerBound {d : ℕ} (hd : 31 ≤ d) :
+    allDegreeLowerBound d < cycleLowerBound (allDegreeIndex d) := by
+  have hr : 2 ≤ allDegreeIndex d := two_le_allDegreeIndex hd
+  have hleading := explicitAllDegreeLowerBound_lt_leading hd
+  have hscale := allDegreeIndex_scale_upper hd
+  have hn : (1 : ℝ) ≤ (3 : ℝ) ^ allDegreeIndex d :=
+    one_le_pow₀ (by norm_num)
+  have hsub : (3 : ℝ) ^ allDegreeIndex d - 1 ≤ ((d : ℝ) + 1) / 4 := by
+    linarith
+  have hsquare := pow_le_pow_left₀ (sub_nonneg.mpr hn) hsub 2
+  have hnegative : ((3 : ℝ) ^ allDegreeIndex d - 1) ^ 2 ≤
+      ((d : ℝ) + 1) ^ 2 / 16 := by
+    nlinarith [hsquare]
+  rw [allDegreeLowerBound_eq_four_mul_explicit,
+    cycleLowerBound_eq_paper_formula (show 1 ≤ allDegreeIndex d by omega)]
+  nlinarith
+
+/-- Transfer the revised explicit bound to any monotone lower-bound function. -/
+theorem subsequenceToAllDegrees_explicit
+    (H : ℕ → ℝ) (hmono : Monotone H)
+    (hsub : ∀ r, 2 ≤ r → (cycleLowerBound r : ℝ) ≤ H (subsequenceDegree r))
+    {d : ℕ} (hd : 31 ≤ d) :
+    allDegreeLowerBound d < H d := by
+  have hr : 2 ≤ allDegreeIndex d := two_le_allDegreeIndex hd
+  exact (allDegreeLowerBound_lt_cycleLowerBound hd).trans_le
+    ((hsub _ hr).trans (hmono (allDegreeIndex_bracket hd).1))
+
+/-- Transfer the coarse positive estimate to a monotone lower-bound function
+for every `N ≥ 31`. -/
 theorem subsequenceToAllDegrees
     (H : ℕ → ℝ) (hmono : Monotone H)
     (hsub : ∀ r, 2 ≤ r → (cycleLowerBound r : ℝ) ≤ H (subsequenceDegree r))
