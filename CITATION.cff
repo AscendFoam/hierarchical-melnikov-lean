@@ -4,6 +4,7 @@ type: software
 title: "Hierarchical Melnikov Realization: Logarithmic Factor Improvement to Hilbert Number Lower Bounds"
 version: 1.1.0
 date-released: 2026-10-08
+doi: 10.5281/zenodo.23219558
 identifiers:
   - type: doi
     value: 10.5281/zenodo.22752133

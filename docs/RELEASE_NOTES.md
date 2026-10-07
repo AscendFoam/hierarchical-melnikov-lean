@@ -2,6 +2,8 @@
 
 ## v1.1.0 — 2026-10-08
 
+Version DOI: [10.5281/zenodo.23219558](https://doi.org/10.5281/zenodo.23219558).
+
 This release accompanies *Hierarchical Melnikov Realization: Logarithmic Factor
 Improvement to Hilbert Number Lower Bounds* by Chaoyang Qin and Xiaoming Sun.
 

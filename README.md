@@ -1,6 +1,6 @@
 # Hilbert 16 Lean-Core
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22752133.svg)](https://doi.org/10.5281/zenodo.22752133)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23219558.svg)](https://doi.org/10.5281/zenodo.23219558)
 
 This is a zero-`sorry`, end-to-end Lean 4 formalization of the repository's
 explicit lower-bound construction for the number of limit cycles of planar
@@ -84,6 +84,8 @@ contains the formalization for the current manuscript, including the revised
 explicit bound for every degree `d >= 31` and the two-author citation metadata.
 `docs/PROOF_MAP.md` maps manuscript labels to audited Lean declarations, and
 `docs/RELEASE_NOTES.md` records the changes between releases.
+The immutable archive for `v1.1.0` is available at
+[version DOI 10.5281/zenodo.23219558](https://doi.org/10.5281/zenodo.23219558).
 
 The software version chain is preserved under
 [Zenodo concept DOI 10.5281/zenodo.22752133](https://doi.org/10.5281/zenodo.22752133).
