@@ -77,8 +77,8 @@ lake env lean Hilbert16/AxiomAudit.lean
 
 ## Companion manuscript
 
-This repository accompanies *Hierarchical Melnikov Realization and an
-N-squared Log-squared Lower Bound for Hilbert Numbers*. The release tagged
+This repository accompanies *Hierarchical Melnikov Realization: Logarithmic Factor Improvement
+to Hilbert Number Lower Bounds*. The release tagged
 `arxiv-v1` identifies the formal source corresponding to the first arXiv
 submission. `docs/PROOF_MAP.md` maps manuscript labels to audited Lean
 declarations. The immutable release archive is available as

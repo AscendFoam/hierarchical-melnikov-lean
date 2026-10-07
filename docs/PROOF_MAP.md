@@ -2,8 +2,8 @@
 
 Last updated: 2026-10-07
 
-This file maps the companion manuscript *Hierarchical Melnikov Realization and an
-N-squared Log-squared Lower Bound for Hilbert Numbers* to Lean declarations.
+This file maps the companion manuscript *Hierarchical Melnikov Realization: Logarithmic Factor Improvement
+to Hilbert Number Lower Bounds* to Lean declarations.
 The `arxiv-v1` release freezes the manuscript-facing version of this map.
 The only allowed status values are `planned`, `proving`, `proved`, and `blocked`.
 
