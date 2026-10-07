@@ -2,11 +2,13 @@ cff-version: 1.2.0
 message: "If you use this formalization, please cite the companion manuscript and this software release."
 type: software
 title: "Hierarchical Melnikov Realization: Logarithmic Factor Improvement to Hilbert Number Lower Bounds"
-version: 1.0.0
-date-released: 2026-09-14
-doi: 10.5281/zenodo.22752134
+version: 1.1.0
+date-released: 2026-10-08
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.22752133
 repository-code: "https://github.com/AscendFoam/hierarchical-melnikov-lean"
-url: "https://github.com/AscendFoam/hierarchical-melnikov-lean"
+url: "https://github.com/AscendFoam/hierarchical-melnikov-lean/releases/tag/v1.1.0"
 authors:
   - family-names: Qin
     given-names: Chaoyang

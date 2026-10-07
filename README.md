@@ -1,6 +1,6 @@
 # Hilbert 16 Lean-Core
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22752134.svg)](https://doi.org/10.5281/zenodo.22752134)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22752133.svg)](https://doi.org/10.5281/zenodo.22752133)
 
 This is a zero-`sorry`, end-to-end Lean 4 formalization of the repository's
 explicit lower-bound construction for the number of limit cycles of planar
@@ -78,11 +78,17 @@ lake env lean Hilbert16/AxiomAudit.lean
 ## Companion manuscript
 
 This repository accompanies *Hierarchical Melnikov Realization: Logarithmic Factor Improvement
-to Hilbert Number Lower Bounds*. The release tagged
-`arxiv-v1` identifies the formal source corresponding to the first arXiv
-submission. `docs/PROOF_MAP.md` maps manuscript labels to audited Lean
-declarations. The immutable release archive is available as
-[Zenodo record 10.5281/zenodo.22752134](https://doi.org/10.5281/zenodo.22752134).
+to Hilbert Number Lower Bounds*. Release
+[`v1.1.0`](https://github.com/AscendFoam/hierarchical-melnikov-lean/releases/tag/v1.1.0)
+contains the formalization for the current manuscript, including the revised
+explicit bound for every degree `d >= 31` and the two-author citation metadata.
+`docs/PROOF_MAP.md` maps manuscript labels to audited Lean declarations, and
+`docs/RELEASE_NOTES.md` records the changes between releases.
+
+The software version chain is preserved under
+[Zenodo concept DOI 10.5281/zenodo.22752133](https://doi.org/10.5281/zenodo.22752133).
+The historical release `arxiv-v1` remains available at
+[version DOI 10.5281/zenodo.22752134](https://doi.org/10.5281/zenodo.22752134).
 
 ## Git boundary
 
